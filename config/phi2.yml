@@ -1,9 +1,8 @@
-# based on original and https://github.com/OpenAccess-AI-Collective/axolotl/blob/main/examples/tiny-llama/lora.yml
-base_model: TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T
-model_type: LlamaForCausalLM
-tokenizer_type: LlamaTokenizer
+base_model: microsoft/phi-2
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
 
-load_in_8bit: true
+load_in_8bit: false
 load_in_4bit: false
 strict: false
 
@@ -19,17 +18,14 @@ datasets:
       field_output: output
       # Format is used by axolotl to generate the prompt.
       format: |-
-        <|system|>
-        You are a friendly chatbot who is trying to help a user with a task. </s>
-        <|user|>
-        {input} {instruction} </s>
-        <|assistant|>
+        Instruct: {input} {instruction}
+        Output:
 
 dataset_prepared_path:
 val_set_size: 0.05
 output_dir: ./lora-out
 
-sequence_len: 4096
+sequence_len: 2048
 sample_packing: false
 eval_sample_packing: false
 pad_to_sequence_len: false
@@ -50,12 +46,12 @@ wandb_run_id:
 gradient_accumulation_steps: 1
 micro_batch_size: 32
 num_epochs: 4
-optimizer: adamw_bnb_8bit
+optimizer: adamw_torch
 lr_scheduler: cosine
 learning_rate: 0.0001
 
 bf16: auto
-fp16:
+fp16: false
 tf32: false
 train_on_inputs: false
 group_by_length: false
@@ -76,6 +72,4 @@ weight_decay: 0.0
 fsdp:
 fsdp_config:
 special_tokens:
-  bos_token: "<s>"
-  eos_token: "</s>"
-  unk_token: "<unk>"
+  pad_token: "<|endoftext|>"
